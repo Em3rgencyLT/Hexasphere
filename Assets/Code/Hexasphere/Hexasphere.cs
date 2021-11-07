@@ -31,31 +31,9 @@ namespace Code.Hexasphere
         };
 
         private List<Face> _faces;
-        private List<Face> _icosahedronFaces = new List<Face>
-        {
-            new Face(Corners[0], Corners[1], Corners[4], false),
-            new Face(Corners[1], Corners[9], Corners[4], false),
-            new Face(Corners[4], Corners[9], Corners[5], false),
-            new Face(Corners[5], Corners[9], Corners[3], false),
-            new Face(Corners[2], Corners[3], Corners[7], false),
-            new Face(Corners[3], Corners[2], Corners[5], false),
-            new Face(Corners[7], Corners[10], Corners[2], false),
-            new Face(Corners[0], Corners[8], Corners[10], false),
-            new Face(Corners[0], Corners[4], Corners[8], false),
-            new Face(Corners[8], Corners[2], Corners[10], false),
-            new Face(Corners[8], Corners[4], Corners[5], false),
-            new Face(Corners[8], Corners[5], Corners[2], false),
-            new Face(Corners[1], Corners[0], Corners[6], false),
-            new Face(Corners[11], Corners[1], Corners[6], false),
-            new Face(Corners[3], Corners[9], Corners[11], false),
-            new Face(Corners[6], Corners[10], Corners[7], false),
-            new Face(Corners[3], Corners[11], Corners[7], false),
-            new Face(Corners[11], Corners[6], Corners[7], false),
-            new Face(Corners[6], Corners[0], Corners[10], false),
-            new Face(Corners[9], Corners[1], Corners[11], false)
-        };
+        private List<Face> _icosahedronFaces;
 
-        public Hexasphere(float radius, int divisions, float hexSize)
+        public Hexasphere(Vector3 origin, float radius, int divisions, float hexSize)
         {
             _radius = radius;
             _divisions = divisions;
@@ -63,6 +41,29 @@ namespace Code.Hexasphere
 
             _points = new List<Point>();
             _faces = new List<Face>();
+            _icosahedronFaces = new List<Face>
+            {
+                new Face(Corners[0], Corners[1], Corners[4], origin, false),
+                new Face(Corners[1], Corners[9], Corners[4], origin, false),
+                new Face(Corners[4], Corners[9], Corners[5], origin, false),
+                new Face(Corners[5], Corners[9], Corners[3], origin, false),
+                new Face(Corners[2], Corners[3], Corners[7], origin, false),
+                new Face(Corners[3], Corners[2], Corners[5], origin, false),
+                new Face(Corners[7], Corners[10], Corners[2], origin, false),
+                new Face(Corners[0], Corners[8], Corners[10], origin, false),
+                new Face(Corners[0], Corners[4], Corners[8], origin, false),
+                new Face(Corners[8], Corners[2], Corners[10], origin, false),
+                new Face(Corners[8], Corners[4], Corners[5], origin, false),
+                new Face(Corners[8], Corners[5], Corners[2], origin, false),
+                new Face(Corners[1], Corners[0], Corners[6], origin, false),
+                new Face(Corners[11], Corners[1], Corners[6], origin, false),
+                new Face(Corners[3], Corners[9], Corners[11], origin, false),
+                new Face(Corners[6], Corners[10], Corners[7], origin, false),
+                new Face(Corners[3], Corners[11], Corners[7], origin, false),
+                new Face(Corners[11], Corners[6], Corners[7], origin, false),
+                new Face(Corners[6], Corners[0], Corners[10], origin, false),
+                new Face(Corners[9], Corners[1], Corners[11], origin, false)
+            };
             
             Corners.ForEach(point => CachePoint(point));
             
@@ -79,12 +80,14 @@ namespace Code.Hexasphere
                     bottomSide = leftSide[i].Subdivide(rightSide[i], i, CachePoint);
                     for (int j = 0; j < i; j++)
                     {
-                        _faces.Add(new Face(previousPoints[j], bottomSide[j], bottomSide[j+1]));
+                        _faces.Add(new Face(previousPoints[j], bottomSide[j], bottomSide[j+1], origin));
                         if (j == 0) continue;
-                        _faces.Add(new Face(previousPoints[j-1], previousPoints[j], bottomSide[j]));
+                        _faces.Add(new Face(previousPoints[j-1], previousPoints[j], bottomSide[j], origin));
                     }
                 }
             });
+
+            _points = _points.Select(point => point.ProjectToSphere(_radius, 0.5f)).ToList();
         }
 
         public List<Point> Points => _points;

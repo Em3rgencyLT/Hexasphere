@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Code.Hexasphere;
@@ -8,6 +7,7 @@ using UnityEngine;
 public class DrawHexasphere : MonoBehaviour
 {
     private MeshFilter _meshFilter;
+    private Hexasphere _hexasphere;
     
     void Start()
     {
@@ -15,15 +15,15 @@ public class DrawHexasphere : MonoBehaviour
         _meshFilter = GetComponent<MeshFilter>();
         _meshFilter.mesh = mesh;
 
-        Hexasphere hexasphere = new Hexasphere(1f, 4, 1f);
-        mesh.vertices = hexasphere.Points.Select(point => point.Position).ToArray();
+        _hexasphere = new Hexasphere(transform.position, 10f, 20, 1f);
+        mesh.vertices = _hexasphere.Points.Select(point => point.Position).ToArray();
 
         List<int> triangleList = new List<int>();
-        hexasphere.Faces.ForEach(face =>
+        _hexasphere.Faces.ForEach(face =>
         {
             face.Points.ForEach(point =>
             {
-                int vertexIndex = hexasphere.Points.FindIndex(corner => corner.ID == point.ID);
+                int vertexIndex = _hexasphere.Points.FindIndex(corner => corner.ID == point.ID);
                 triangleList.Add(vertexIndex);
             });
         });
@@ -31,4 +31,12 @@ public class DrawHexasphere : MonoBehaviour
         
         mesh.RecalculateNormals();
     }
+
+    /*private void Update()
+    {
+        _hexasphere.Faces.ForEach(face =>
+        {
+            Debug.DrawRay(face.CenterPoint.Position, face.Normal * 10, Color.red);
+        });
+    }*/
 }
