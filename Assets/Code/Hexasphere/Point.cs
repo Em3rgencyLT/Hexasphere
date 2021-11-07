@@ -18,6 +18,13 @@ namespace Code.Hexasphere
             _faces = new List<Face>();
         }
 
+        private Point(Vector3 position, string id, List<Face> faces)
+        {
+            _id = id;
+            _position = position;
+            _faces = faces;
+        }
+
         public Vector3 Position => _position;
 
         public string ID => _id;
@@ -54,7 +61,7 @@ namespace Code.Hexasphere
             float x = _position.x * projectionPoint * t;
             float y = _position.y * projectionPoint * t;
             float z = _position.z * projectionPoint * t;
-            return new Point(new Vector3(x, y, z));
+            return new Point(new Vector3(x, y, z), _id, _faces);
         }
 
         public List<Face> GetOrderedFaces()
