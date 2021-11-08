@@ -10,6 +10,8 @@ namespace Code.Hexasphere
         private string _id;
         private readonly Vector3 _position;
         private List<Face> _faces;
+        
+        private const float PointComparisonAccuracy = 0.000001f;
 
         public Point(Vector3 position)
         {
@@ -22,6 +24,7 @@ namespace Code.Hexasphere
         {
             _id = id;
             _position = position;
+            _faces = new List<Face>();
             _faces = faces;
         }
 
@@ -72,7 +75,8 @@ namespace Code.Hexasphere
             Face currentFace = _faces[0];
             while (orderedList.Count < _faces.Count)
             {
-                Face neighbour = _faces.First(face => face.ID != currentFace.ID && face.IsAdjacentToFace(currentFace));
+                List<string> existingIds = orderedList.Select(face => face.ID).ToList();
+                Face neighbour = _faces.First(face => !existingIds.Contains(face.ID) && face.IsAdjacentToFace(currentFace));
                 currentFace = neighbour;
                 orderedList.Add(currentFace);
             }
@@ -86,6 +90,14 @@ namespace Code.Hexasphere
             List<string> otherFaceIds = otherPoint.Faces.Select(face => face.ID).ToList();
             string desiredId = faceIds.Intersect(otherFaceIds).First(id => id != excludedFace.ID);
             return _faces.First(face => face.ID == desiredId);
+        }
+
+        public static bool IsOverlapping(Point a, Point b)
+        {
+            return
+                Mathf.Abs(a.Position.x - b.Position.x) <= PointComparisonAccuracy &&
+                Mathf.Abs(a.Position.y - b.Position.y) <= PointComparisonAccuracy &&
+                Mathf.Abs(a.Position.z - b.Position.z) <= PointComparisonAccuracy;
         }
 
         public override string ToString()

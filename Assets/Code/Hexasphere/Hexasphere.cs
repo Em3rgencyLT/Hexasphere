@@ -9,26 +9,11 @@ namespace Code.Hexasphere
         private float _radius;
         private int _divisions;
         private float _hexSize;
-        private static float _tao = Mathf.PI / 2;
+        private List<Tile> _tiles;
         private List<Point> _points;
+        private static float _tao = Mathf.PI / 2;
+        private List<Point> _dividedIcosahedronPoints;
         private const float DefaultSize = 100f;
-        private const float PointComparisonAccuracy = 0.000001f;
-        
-        private static readonly List<Point> Corners = new List<Point>
-        {
-            new Point(new Vector3(DefaultSize, _tao * DefaultSize, 0f)),
-            new Point(new Vector3(-DefaultSize, _tao * DefaultSize, 0f)),
-            new Point(new Vector3(DefaultSize, -_tao * DefaultSize, 0f)),
-            new Point(new Vector3(-DefaultSize, -_tao * DefaultSize, 0f)),
-            new Point(new Vector3(0, DefaultSize, _tao * DefaultSize)),
-            new Point(new Vector3(0, -DefaultSize, _tao * DefaultSize)),
-            new Point(new Vector3(0, DefaultSize, -_tao * DefaultSize)),
-            new Point(new Vector3(0, -DefaultSize, -_tao * DefaultSize)),
-            new Point(new Vector3(_tao * DefaultSize, 0f, DefaultSize)),
-            new Point(new Vector3(-_tao * DefaultSize, 0f, DefaultSize)),
-            new Point(new Vector3(_tao * DefaultSize, 0f, -DefaultSize)),
-            new Point(new Vector3(-_tao * DefaultSize, 0f, -DefaultSize))
-        };
 
         private List<Face> _faces;
         private List<Face> _icosahedronFaces;
@@ -39,33 +24,52 @@ namespace Code.Hexasphere
             _divisions = divisions;
             _hexSize = hexSize;
 
+            _tiles = new List<Tile>();
             _points = new List<Point>();
+            _dividedIcosahedronPoints = new List<Point>();
             _faces = new List<Face>();
+            
+             List<Point> icosahedronCorners = new List<Point>
+            {
+                new Point(new Vector3(DefaultSize, _tao * DefaultSize, 0f)),
+                new Point(new Vector3(-DefaultSize, _tao * DefaultSize, 0f)),
+                new Point(new Vector3(DefaultSize, -_tao * DefaultSize, 0f)),
+                new Point(new Vector3(-DefaultSize, -_tao * DefaultSize, 0f)),
+                new Point(new Vector3(0, DefaultSize, _tao * DefaultSize)),
+                new Point(new Vector3(0, -DefaultSize, _tao * DefaultSize)),
+                new Point(new Vector3(0, DefaultSize, -_tao * DefaultSize)),
+                new Point(new Vector3(0, -DefaultSize, -_tao * DefaultSize)),
+                new Point(new Vector3(_tao * DefaultSize, 0f, DefaultSize)),
+                new Point(new Vector3(-_tao * DefaultSize, 0f, DefaultSize)),
+                new Point(new Vector3(_tao * DefaultSize, 0f, -DefaultSize)),
+                new Point(new Vector3(-_tao * DefaultSize, 0f, -DefaultSize))
+            };
+             
             _icosahedronFaces = new List<Face>
             {
-                new Face(Corners[0], Corners[1], Corners[4], origin, false),
-                new Face(Corners[1], Corners[9], Corners[4], origin, false),
-                new Face(Corners[4], Corners[9], Corners[5], origin, false),
-                new Face(Corners[5], Corners[9], Corners[3], origin, false),
-                new Face(Corners[2], Corners[3], Corners[7], origin, false),
-                new Face(Corners[3], Corners[2], Corners[5], origin, false),
-                new Face(Corners[7], Corners[10], Corners[2], origin, false),
-                new Face(Corners[0], Corners[8], Corners[10], origin, false),
-                new Face(Corners[0], Corners[4], Corners[8], origin, false),
-                new Face(Corners[8], Corners[2], Corners[10], origin, false),
-                new Face(Corners[8], Corners[4], Corners[5], origin, false),
-                new Face(Corners[8], Corners[5], Corners[2], origin, false),
-                new Face(Corners[1], Corners[0], Corners[6], origin, false),
-                new Face(Corners[11], Corners[1], Corners[6], origin, false),
-                new Face(Corners[3], Corners[9], Corners[11], origin, false),
-                new Face(Corners[6], Corners[10], Corners[7], origin, false),
-                new Face(Corners[3], Corners[11], Corners[7], origin, false),
-                new Face(Corners[11], Corners[6], Corners[7], origin, false),
-                new Face(Corners[6], Corners[0], Corners[10], origin, false),
-                new Face(Corners[9], Corners[1], Corners[11], origin, false)
+                new Face(icosahedronCorners[0], icosahedronCorners[1], icosahedronCorners[4], origin, false),
+                new Face(icosahedronCorners[1], icosahedronCorners[9], icosahedronCorners[4], origin, false),
+                new Face(icosahedronCorners[4], icosahedronCorners[9], icosahedronCorners[5], origin, false),
+                new Face(icosahedronCorners[5], icosahedronCorners[9], icosahedronCorners[3], origin, false),
+                new Face(icosahedronCorners[2], icosahedronCorners[3], icosahedronCorners[7], origin, false),
+                new Face(icosahedronCorners[3], icosahedronCorners[2], icosahedronCorners[5], origin, false),
+                new Face(icosahedronCorners[7], icosahedronCorners[10], icosahedronCorners[2], origin, false),
+                new Face(icosahedronCorners[0], icosahedronCorners[8], icosahedronCorners[10], origin, false),
+                new Face(icosahedronCorners[0], icosahedronCorners[4], icosahedronCorners[8], origin, false),
+                new Face(icosahedronCorners[8], icosahedronCorners[2], icosahedronCorners[10], origin, false),
+                new Face(icosahedronCorners[8], icosahedronCorners[4], icosahedronCorners[5], origin, false),
+                new Face(icosahedronCorners[8], icosahedronCorners[5], icosahedronCorners[2], origin, false),
+                new Face(icosahedronCorners[1], icosahedronCorners[0], icosahedronCorners[6], origin, false),
+                new Face(icosahedronCorners[11], icosahedronCorners[1], icosahedronCorners[6], origin, false),
+                new Face(icosahedronCorners[3], icosahedronCorners[9], icosahedronCorners[11], origin, false),
+                new Face(icosahedronCorners[6], icosahedronCorners[10], icosahedronCorners[7], origin, false),
+                new Face(icosahedronCorners[3], icosahedronCorners[11], icosahedronCorners[7], origin, false),
+                new Face(icosahedronCorners[11], icosahedronCorners[6], icosahedronCorners[7], origin, false),
+                new Face(icosahedronCorners[6], icosahedronCorners[0], icosahedronCorners[10], origin, false),
+                new Face(icosahedronCorners[9], icosahedronCorners[1], icosahedronCorners[11], origin, false)
             };
             
-            Corners.ForEach(point => CachePoint(point));
+            icosahedronCorners.ForEach(point => CachePoint(point));
             
             _icosahedronFaces.ForEach(icoFace =>
             {
@@ -86,26 +90,24 @@ namespace Code.Hexasphere
                     }
                 }
             });
-
-            _points = _points.Select(point => point.ProjectToSphere(_radius, 0.5f)).ToList();
+            
+            _dividedIcosahedronPoints.ForEach(point =>
+            {
+                _tiles.Add(new Tile(point, _radius, hexSize, origin));
+            });
         }
 
-        public List<Point> Points => _points;
-
-        public List<Face> Faces => _faces;
+        public List<Tile> Tiles => _tiles;
 
         private Point CachePoint(Point point)
         {
-            Point existingPoint = _points.FirstOrDefault(candidatePoint => 
-                Mathf.Abs(candidatePoint.Position.x - point.Position.x) <= PointComparisonAccuracy &&
-                Mathf.Abs(candidatePoint.Position.y - point.Position.y) <= PointComparisonAccuracy &&
-                Mathf.Abs(candidatePoint.Position.z - point.Position.z) <= PointComparisonAccuracy);
+            Point existingPoint = _dividedIcosahedronPoints.FirstOrDefault(candidatePoint => Point.IsOverlapping(candidatePoint, point));
             if (existingPoint != null)
             {
                 return existingPoint;
             }
             
-            _points.Add(point);
+            _dividedIcosahedronPoints.Add(point);
             return point;
         }
     }
