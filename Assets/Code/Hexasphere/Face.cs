@@ -9,7 +9,6 @@ namespace Code.Hexasphere
     {
         private string _id;
         private List<Point> _points;
-        private Point _centerPoint;
         private Vector3 _normal;
 
         public Face(Point point1, Point point2, Point point3, Vector3 origin, bool trackFaceInPoints = true)
@@ -19,10 +18,10 @@ namespace Code.Hexasphere
             float centerX = (point1.Position.x + point2.Position.x + point3.Position.x) / 3;
             float centerY = (point1.Position.y + point2.Position.y + point3.Position.y) / 3;
             float centerZ = (point1.Position.z + point2.Position.z + point3.Position.z) / 3;
-            _centerPoint = new Point(new Vector3(centerX, centerY, centerZ));
+            Vector3 center = new Vector3(centerX, centerY, centerZ);
 
             Vector3 normal = GetNormal(point1, point2, point3);
-            if (IsNormalPointingAwayFromOrigin(origin, _centerPoint.Position, normal))
+            if (IsNormalPointingAwayFromOrigin(origin, center, normal))
             {
                 _points = new List<Point> {point1, point2, point3};
                 _normal = normal;
@@ -42,8 +41,6 @@ namespace Code.Hexasphere
         public string ID => _id;
 
         public List<Point> Points => _points;
-
-        public Point CenterPoint => _centerPoint;
 
         public Vector3 Normal => _normal;
 
@@ -72,6 +69,15 @@ namespace Code.Hexasphere
             List<string> thisFaceIds = _points.Select(point => point.ID).ToList();
             List<string> otherFaceIds = face.Points.Select(point => point.ID).ToList();
             return thisFaceIds.Intersect(otherFaceIds).ToList().Count == 2;
+        }
+
+        public Point GetCenter()
+        {
+            float centerX = (_points[0].Position.x + _points[1].Position.x + _points[2].Position.x) / 3;
+            float centerY = (_points[0].Position.y + _points[1].Position.y + _points[2].Position.y) / 3;
+            float centerZ = (_points[0].Position.z + _points[1].Position.z + _points[2].Position.z) / 3;
+
+            return new Point(new Vector3(centerX, centerY, centerZ));
         }
 
         private bool IsPointPartOfFace(Point point)
