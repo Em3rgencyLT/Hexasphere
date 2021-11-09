@@ -1,12 +1,10 @@
-using System.Collections.Generic;
-using System.Linq;
 using Code.Hexasphere;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class DrawHexasphere : MonoBehaviour
 {
-    [Range(5f,2000f)]
+    [Min(5f)]
     [SerializeField] private float radius = 10f;
     [Range(1, 15)]
     [SerializeField] private int divisions = 4;
@@ -46,30 +44,12 @@ public class DrawHexasphere : MonoBehaviour
         _oldHexSize = hexSize;
         _lastUpdated = 0f;
         
-        _hexasphere = new Hexasphere(transform.position, radius, divisions, hexSize);
-        List<Point> vertexes = new List<Point>();
-        List<int> triangleList = new List<int>();
-        _hexasphere.Tiles.ForEach(tile =>
-        {
-            tile.Points.ForEach(point =>
-            {
-                vertexes.Add(point);
-            });
-            tile.Faces.ForEach(face =>
-            {
-                face.Points.ForEach(point =>
-                {
-                    int vertexIndex = vertexes.FindIndex(vertex => vertex.ID == point.ID);
-                    triangleList.Add(vertexIndex);
-                });
-            });
-        });
+        _hexasphere = new Hexasphere(radius, divisions, hexSize);
 
         _mesh = new Mesh();
         _meshFilter.mesh = _mesh;
-        _mesh.vertices = vertexes.Select(point => point.Position).ToArray();
-        _mesh.triangles = triangleList.ToArray();
-        
+        _mesh.vertices = _hexasphere.MeshDetails.Vertices.ToArray();
+        _mesh.triangles = _hexasphere.MeshDetails.Triangles.ToArray();
         _mesh.RecalculateNormals();
     }
 }
