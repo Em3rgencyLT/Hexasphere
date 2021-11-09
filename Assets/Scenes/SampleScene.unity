@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 505193935}
   - component: {fileID: 505193938}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Hexasphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 500
-  divisions: 8
+  divisions: 15
   hexSize: 0.95
 --- !u!33 &505193936
 MeshFilter:
@@ -173,7 +173,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 505193934}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 250, y: 250, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
