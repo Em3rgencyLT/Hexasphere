@@ -7,9 +7,9 @@ namespace Code.Hexasphere
 {
     public class Point
     {
-        private string _id;
+        private readonly string _id;
         private readonly Vector3 _position;
-        private List<Face> _faces;
+        private readonly List<Face> _faces;
         
         private const float PointComparisonAccuracy = 0.000001f;
 
@@ -22,9 +22,10 @@ namespace Code.Hexasphere
 
         private Point(Vector3 position, string id, List<Face> faces)
         {
+            _faces = new List<Face>();
+            
             _id = id;
             _position = position;
-            _faces = new List<Face>();
             _faces = faces;
         }
 
@@ -36,7 +37,7 @@ namespace Code.Hexasphere
 
         public void AssignFace(Face face)
         {
-            this._faces.Add(face);
+            _faces.Add(face);
         }
 
         public List<Point> Subdivide(Point target, int count, Func<Point, Point> findDuplicatePointIfExists)
@@ -72,7 +73,7 @@ namespace Code.Hexasphere
             if (_faces.Count == 0) return _faces;
             List<Face> orderedList = new List<Face> {_faces[0]};
 
-            Face currentFace = _faces[0];
+            Face currentFace = orderedList[0];
             while (orderedList.Count < _faces.Count)
             {
                 List<string> existingIds = orderedList.Select(face => face.ID).ToList();
@@ -82,14 +83,6 @@ namespace Code.Hexasphere
             }
 
             return orderedList;
-        }
-
-        public Face FindCommonFaceExcluding(Point otherPoint, Face excludedFace)
-        {
-            List<string> faceIds = _faces.Select(face => face.ID).ToList();
-            List<string> otherFaceIds = otherPoint.Faces.Select(face => face.ID).ToList();
-            string desiredId = faceIds.Intersect(otherFaceIds).First(id => id != excludedFace.ID);
-            return _faces.First(face => face.ID == desiredId);
         }
 
         public static bool IsOverlapping(Point a, Point b)
@@ -107,7 +100,7 @@ namespace Code.Hexasphere
 
         public string ToJson()
         {
-            return $"{{x:{_position.x},y:{_position.y},z:{_position.z}}}";
+            return $"{{\"x\":{_position.x},\"y\":{_position.y},\"z\":{_position.z}, \"guid\":\"{_id}\"}}";
         }
     }
 }

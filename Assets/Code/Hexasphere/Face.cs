@@ -7,11 +7,10 @@ namespace Code.Hexasphere
 {
     public class Face
     {
-        private string _id;
-        private List<Point> _points;
-        private Vector3 _normal;
+        private readonly string _id;
+        private readonly List<Point> _points;
 
-        public Face(Point point1, Point point2, Point point3, Vector3 origin, bool trackFaceInPoints = true)
+        public Face(Point point1, Point point2, Point point3, bool trackFaceInPoints = true)
         {
             _id = Guid.NewGuid().ToString();
 
@@ -20,17 +19,11 @@ namespace Code.Hexasphere
             float centerZ = (point1.Position.z + point2.Position.z + point3.Position.z) / 3;
             Vector3 center = new Vector3(centerX, centerY, centerZ);
 
+            //Determine correct winding order
             Vector3 normal = GetNormal(point1, point2, point3);
-            if (IsNormalPointingAwayFromOrigin(origin, center, normal))
-            {
-                _points = new List<Point> {point1, point2, point3};
-                _normal = normal;
-            }
-            else
-            {
-                _points = new List<Point> {point1, point3, point2};
-                _normal = GetNormal(point1, point3, point2);
-            }
+            _points = IsNormalPointingAwayFromOrigin(center, normal) ? 
+                new List<Point> {point1, point2, point3} : 
+                new List<Point> {point1, point3, point2};
 
             if (trackFaceInPoints)
             {
@@ -42,8 +35,6 @@ namespace Code.Hexasphere
 
         public List<Point> Points => _points;
 
-        public Vector3 Normal => _normal;
-
         public List<Point> GetOtherPoints(Point point)
         {
             if (!IsPointPartOfFace(point))
@@ -52,16 +43,6 @@ namespace Code.Hexasphere
             }
 
             return _points.Where(facePoint => facePoint.ID != point.ID).ToList();
-        }
-
-        public Point FindThirdPoint(Point point1, Point point2)
-        {
-            if (!IsPointPartOfFace(point1) || !IsPointPartOfFace(point2))
-            {
-                throw new ArgumentException("Given point must be one of the points on the face!");
-            }
-            
-            return _points.First(facePoint => facePoint.ID != point1.ID && facePoint.ID != point2.ID);
         }
 
         public bool IsAdjacentToFace(Face face)
@@ -85,7 +66,7 @@ namespace Code.Hexasphere
             return _points.Any(facePoint => facePoint.ID == point.ID);
         }
 
-        public static Vector3 GetNormal(Point point1, Point point2, Point point3)
+        private static Vector3 GetNormal(Point point1, Point point2, Point point3)
         {
             Vector3 side1 = point2.Position - point1.Position;
             Vector3 side2 = point3.Position - point1.Position;
@@ -95,10 +76,10 @@ namespace Code.Hexasphere
             return cross / cross.magnitude;
         }
 
-        private static bool IsNormalPointingAwayFromOrigin(Vector3 origin, Vector3 surface, Vector3 normal)
+        private static bool IsNormalPointingAwayFromOrigin(Vector3 surface, Vector3 normal)
         {
             //Does adding the normal vector to the center point of the face get you closer or further from the center of the polyhedron?
-            return Vector3.Distance(origin, surface) < Vector3.Distance(origin, surface + normal);
+            return Vector3.Distance(Vector3.zero, surface) < Vector3.Distance(Vector3.zero, surface + normal);
         }
     }
 }
