@@ -11,7 +11,7 @@ namespace Code.Hexasphere
         private readonly Vector3 _position;
         private readonly List<Face> _faces;
         
-        private const float PointComparisonAccuracy = 0.000001f;
+        private const float PointComparisonAccuracy = 0.0001f;
 
         public Point(Vector3 position)
         {
